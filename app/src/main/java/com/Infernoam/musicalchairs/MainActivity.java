@@ -1,9 +1,5 @@
 package com.Infernoam.musicalchairs;
 
-import static com.facebook.FacebookSdk.getCacheDir;
-
-import static java.security.AccessController.getContext;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,8 +9,6 @@ import androidx.core.app.ActivityCompat;
 import android.Manifest;
 
 import android.annotation.SuppressLint;
-import android.content.ContentResolver;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -23,34 +17,38 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowMetrics;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 
+import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
+import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.interstitial.InterstitialAd;
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 
 @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
 public class MainActivity extends AppCompatActivity {
+
+
+    private AdView bannerAdView;
 
     private static String[] PERMISSIONS_STORAGE = {
             Manifest.permission.READ_MEDIA_AUDIO
@@ -97,6 +95,10 @@ public class MainActivity extends AppCompatActivity {
     List<Integer> SONGS = Arrays.asList(R.raw.springupbeat, R.raw.chaseme, R.raw.happyenergeticday, R.raw.sunnydaysindie, R.raw.quickstart, R.raw.childrenelectroswing1, R.raw.aherofthe80s, R.raw.catchit, R.raw.electrosummerpositiveparty, R.raw.energeticindierockjump); // example for playlist
 
     boolean isLocalSong = false;
+
+    boolean isTimerVisible = false;
+
+
 
 
     @SuppressLint("UseCompatLoadingForDrawables")
@@ -239,9 +241,39 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
                         // Handle the error
+                        Log.d("ad",  loadAdError.toString());
                         mInterstitialAd = null;
                     }
                 });
+
+        bannerAdView = findViewById(R.id.adView);
+        AdRequest bannerAdRequest = new AdRequest.Builder().build();
+        bannerAdView.loadAd(bannerAdRequest);
+
+        bannerAdView.setAdListener(new AdListener() {@Override
+        public void onAdLoaded() {
+            // Code to execute when an ad is successfully loaded
+            Log.d("AdMob", "Banner ad loaded successfully");
+            // You can perform actions here, like making the ad view visible if it was hidden
+        }
+
+            @Override
+            public void onAdFailedToLoad(@NonNull LoadAdError error) {
+                // Code to execute when an ad fails to load.
+                Log.e("AdMob", "Banner ad failed to load: " + error.getMessage());
+                // Handle the error appropriately, e.g., try loading again later, show a placeholder, etc.
+            }
+        });
+
+        if(!isTimerVisible) {
+            bannerAdView.setVisibility(View.VISIBLE);
+        }
+        else {
+            bannerAdView.setVisibility(View.GONE);
+        }
+
+
+
     }
 
 
@@ -283,7 +315,6 @@ public class MainActivity extends AppCompatActivity {
     };
 
     public boolean handleInput() {
-        //Lengths();
         boolean Valid = true;
         boolean i2v = true;
         boolean i3v = true;
@@ -608,11 +639,13 @@ public class MainActivity extends AppCompatActivity {
             mTextViewCountDown.setVisibility(View.GONE);
             ((ProgressBar) (findViewById(R.id.progressBar))).setVisibility(View.GONE);
             Log.d("MusiChairs", "Timer Invisible");
+            isTimerVisible = false;
 
         } else {
             mTextViewCountDown.setVisibility(View.VISIBLE);
             ((ProgressBar) (findViewById(R.id.progressBar))).setVisibility(View.VISIBLE);
             Log.d("MusiChairs", "Timer Visible");
+            isTimerVisible = true;
         }
     }
 
@@ -675,6 +708,48 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
     }
-}
 
+
+    // Get the ad size with screen width.
+    public AdSize getAdSize() {
+        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+        int adWidthPixels = displayMetrics.widthPixels;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            WindowMetrics windowMetrics = this.getWindowManager().getCurrentWindowMetrics();
+            adWidthPixels = windowMetrics.getBounds().width();
+        }
+
+        float density = displayMetrics.density;
+        int adWidth = (int) (adWidthPixels / density);
+        return AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(this, adWidth);
+    }
+    /** Called when leaving the activity */
+    @Override
+    public void onPause() {
+        if (bannerAdView != null) {
+            bannerAdView.pause();
+        }
+        super.onPause();
+    }
+
+    /** Called when returning to the activity */
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (bannerAdView != null) {
+            bannerAdView.resume();
+        }
+    }
+
+    /** Called before the activity is destroyed */
+    @Override
+    public void onDestroy() {
+        if (bannerAdView != null) {
+            bannerAdView.destroy();
+        }
+        super.onDestroy();
+    }
+
+}
 
