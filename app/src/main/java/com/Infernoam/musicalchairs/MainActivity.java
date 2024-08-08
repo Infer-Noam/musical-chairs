@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
 
     private InterstitialAd mInterstitialAd;
-    private int AdCounter = 1;
+    private int AdCounter = 3;
     private EditText input1; //input of players
     private EditText input2; //input of shortest round
     private EditText input3; //input of longest round
@@ -502,7 +502,7 @@ public class MainActivity extends AppCompatActivity {
             }
         } else {
             SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
-            isLocalSong = sharedPreferences.getBoolean("isLocalSong", true);
+            isLocalSong = sharedPreferences.getBoolean("isLocalSong", false);
 
             if (player == null) {
 
