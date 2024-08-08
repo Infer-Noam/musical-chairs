@@ -12,7 +12,7 @@ These instructions will get you a copy of the project up and running on your loc
 - Android Views
   
 ### Installing
-1. Clone the repo: [`git clone https://github.com/Infer-Noam/Schedulex.git    ](https://github.com/Infer-Noam/Musichairs.git)
+1. Clone the repo: ['https://github.com/Infer-Noam/MusicalChairs.git' ]
 2. Open the project in Android Studio.
 3. Run the app on an emulator or a real device.
 
