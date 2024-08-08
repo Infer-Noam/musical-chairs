@@ -1,0 +1,61 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+    <PreferenceCategory
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:title="@string/songs_header">
+
+        <ListPreference
+            app:defaultValue="song"
+            app:entries="@array/song_entries"
+            app:entryValues="@array/song_values"
+            app:key="song"
+            app:title="@string/Songs_title"
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+    <PreferenceCategory app:title="@string/auto_header">
+
+        <SwitchPreference
+            app:key="auto"
+            app:title="@string/auto_title"
+            app:summaryOff="@string/auto_off"
+            app:summaryOn="@string/auto_on" />
+
+        <EditTextPreference
+            app:dependency="auto"
+            app:key="autoTimes"
+            app:title="@string/auto_attach_title"
+            app:summary="@string/auto_attach_summery"/>
+
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        app:title="@string/visibilty_timer_header">
+
+        <SwitchPreferenceCompat
+            app:key="TimerVisibility"
+            app:title="@string/Visibility_Timer_title"
+            app:summaryOff="@string/timer_invisible"
+            app:summaryOn="@string/timer_visible" />
+
+
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        app:title="@string/background_header">
+
+        <SwitchPreferenceCompat
+            app:key="background"
+            app:title="@string/background_title"
+            app:summaryOff="@string/background_light"
+            app:summaryOn="@string/background_dark" />
+
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

@@ -1,0 +1,45 @@
+<resources>
+    <string name="input1">The amount of players:</string>
+    <string name="app_name">Musical Chairs</string>
+    <string name="warn1">The player count has to be between 2 – 60</string>
+    <string name="warn2">The shortest round has to be between 5 – 15</string>
+    <string name="warn3">The longest round has to be between 15 – 30</string>
+    <string name="StartButton">Start a new game</string>
+    <string name="ResetButton">Reset the round</string>
+    <string name="EndButton">End the game</string>
+    <string name="roundMin">Shortest possible round:</string>
+    <string name="roundMax">Longest possible round:</string>
+    <string name="start">Start a new game</string>
+    <string name="sec">seconds</string>
+    <string name="reset">Reset round</string>
+    <string name="title_activity_settings">SettingsActivity</string>
+
+    <!-- Preference Titles -->
+    <string name="background_header">Theme</string>
+    <string name="songs_header">Songs</string>
+    <string name="visibilty_timer_header">Timer visibility</string>
+    <string name="auto_header">Auto start rounds</string>
+
+    <!-- Background image Preferences -->
+    <string name="background_title">Change the theme</string>
+    <string name="background_dark">Dark theme</string>
+    <string name="background_light">Light theme</string>
+
+    <!-- Songs Preferences -->
+    <string name="Songs_title">Change the song</string>
+
+    <!-- Timer visibility Preferences -->
+    <string name="Visibility_Timer_title">Show the timer</string>
+    <string name="timer_invisible">Invisible</string>
+    <string name="timer_visible">Visible</string>
+
+    <!-- Auto Rounds Preferences -->
+    <string name="auto_title">Automatic start of rounds</string>
+    <string name="auto_on">Active</string>
+    <string name="auto_off">Not active</string>
+    <string name="auto_attach_title">The time between rounds</string>
+    <string name="auto_attach_summery">Enter a value between 1 – 60</string>
+
+    <!-- Facebook -->
+    <string name="facebook_app_id">1051324902871943</string>
+</resources>

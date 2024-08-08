@@ -1,0 +1,39 @@
+<resources>
+
+    <string-array name="song_entries">
+        <item>Spring upbeat</item>
+        <item>Chase me</item>
+        <item>happy energetic day</item>
+        <item>Sunny days indie</item>
+        <item>Quick start</item>
+        <item>Children electro swing</item>
+        <item>A hero of the 80s</item>
+        <item>Catch it</item>
+        <item>Electro summer party</item>
+        <item>Energetic indie rock jump</item>
+        <item>Funny running</item>
+        <item>Happy day</item>
+        <item>Lady of the 80s</item>
+        <item>Retro funk energetic
+        </item>
+        <item>Up beat rock good news</item>
+    </string-array>
+
+    <string-array name="song_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+        <item>11</item>
+        <item>12</item>
+        <item>13</item>
+        <item>14</item>
+    </string-array>
+</resources>
