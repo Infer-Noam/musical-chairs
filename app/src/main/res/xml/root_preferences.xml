@@ -2,10 +2,21 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
 
+
     <PreferenceCategory
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:title="@string/songs_header">
+
+        <SwitchPreference
+            app:key="isLocalSong"
+            app:title="@string/isLocalSong_title"
+            app:summaryOff="@string/isLocalSong_off"
+            app:summaryOn="@string/isLocalSong_on" />
+
+        <com.Infernoam.musicalchairs.AudioFilePreference
+            android:key="audioFile"
+            android:dependency="isLocalSong"/>
 
         <ListPreference
             app:defaultValue="song"
@@ -14,6 +25,7 @@
             app:key="song"
             app:title="@string/Songs_title"
             app:useSimpleSummaryProvider="true" />
+
 
     </PreferenceCategory>
     <PreferenceCategory app:title="@string/auto_header">

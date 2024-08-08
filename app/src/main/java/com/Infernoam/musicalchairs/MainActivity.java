@@ -1,22 +1,31 @@
 package com.Infernoam.musicalchairs;
 
+import static com.facebook.FacebookSdk.getCacheDir;
+
+import static java.security.AccessController.getContext;
+
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.core.app.ActivityCompat;
+
+import android.Manifest;
 
 import android.annotation.SuppressLint;
+import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.content.pm.Signature;
 import android.media.MediaPlayer;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Base64;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,9 +33,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -37,9 +49,14 @@ import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.interstitial.InterstitialAd;
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 
-import com.facebook.FacebookSdk;
-
+@RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
 public class MainActivity extends AppCompatActivity {
+
+    private static String[] PERMISSIONS_STORAGE = {
+            Manifest.permission.READ_MEDIA_AUDIO
+    };
+
+    private static final int REQUEST_EXTERNAL_STORAGE = 1;
 
     private InterstitialAd mInterstitialAd;
     private int AdCounter = 1;
@@ -52,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView mTextViewCountDown;
     private Button mButtonReset;
     private TextView rCount;
-    private Button EndButton; //the buttonthat end the game
+    private Button EndButton; //the button that end the game
 
     private CountDownTimer mCountDownTimer;
 
@@ -71,19 +88,24 @@ public class MainActivity extends AppCompatActivity {
     private Integer songNumber = 0;
     MediaPlayer player;
     boolean settingsActive = true;
-   SharedPreferences sharedPreferences;
-   private static final int SETTINGS_REQUEST_CODE = 1;
+    SharedPreferences sharedPreferences;
+    private static final int SETTINGS_REQUEST_CODE = 1;
 
-   boolean autoRound = false;
-   boolean timerDefult = true; // timerdefult is the timer that count rounds, if false the timer is being use between rounds
+    boolean autoRound = false;
+    boolean timerDefult = true; // timerdefult is the timer that count rounds, if false the timer is being use between rounds
     boolean fPause = true;
-    List<Integer> SONGS = Arrays.asList(R.raw.springupbeat, R.raw.chaseme, R.raw.happyenergeticday, R.raw.sunnydaysindie, R.raw.quickstart, R.raw.childrenelectroswing1, R.raw.aherofthe80s, R.raw.catchit, R.raw.electrosummerpositiveparty, R.raw.energeticindierockjump, R.raw.funnyrunning, R.raw.happyday, R.raw.ladyofthe80, R.raw.retrofunkenergeticbackgroundmusic, R.raw.upbeatrockgoodnews); // example for playlist
+    List<Integer> SONGS = Arrays.asList(R.raw.springupbeat, R.raw.chaseme, R.raw.happyenergeticday, R.raw.sunnydaysindie, R.raw.quickstart, R.raw.childrenelectroswing1, R.raw.aherofthe80s, R.raw.catchit, R.raw.electrosummerpositiveparty, R.raw.energeticindierockjump); // example for playlist
+
+    boolean isLocalSong = false;
+
 
     @SuppressLint("UseCompatLoadingForDrawables")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
 
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_settings);// set drawable icon
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -105,11 +127,11 @@ public class MainActivity extends AppCompatActivity {
 
         TimerVisibility();
 
-        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         buttonStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 if (mTimerRunning) {
                     pauseTimer();
                     fPause = false;
@@ -117,8 +139,37 @@ public class MainActivity extends AppCompatActivity {
                     startTimer();
                     settingsActive = false;
                 }
-                if (timerDefult) {
-                    playPause(v);
+                if (timerDefult) { // if pause is the button
+                    boolean success = playPause(v);
+
+                    if (!success) {
+                        mCountDownTimer.cancel();
+                        mTimerRunning = false;
+                        EndButton.setEnabled(false);
+                        EndButton.setVisibility(View.INVISIBLE);
+                        buttonStart.setText("Start a new game");
+                        mTimeLeftInMillis = START_TIME_IN_MILLIS;
+                        mButtonReset.setVisibility(View.INVISIBLE);
+                        mButtonReset.setEnabled(false);
+                        input1.setEnabled(true);
+                        input2.setEnabled(true);
+                        input3.setEnabled(true);
+                        round = 1;
+                        rCount.setText("Game ended");
+                        Random r = new Random();
+                        if (MaxRound == MinRound) {
+                            mTimeLeftInMillis = 15000;
+                        } else {
+                            mTimeLeftInMillis = (r.nextInt(MaxRound - MinRound) + MinRound) * 1000L;
+                        }
+                        START_TIME_IN_MILLIS = mTimeLeftInMillis;
+                        ((ProgressBar) findViewById(R.id.progressBar)).setMax((int) mTimeLeftInMillis * 1000);
+                        updateCountDownText();
+                        //the end button stops working, the timer returns to 00:00 and you need to reenter values
+                        stopPlayer();
+                        settingsActive = true;
+                        timerDefult = true;
+                    }
                 }
             }
         });
@@ -148,14 +199,13 @@ public class MainActivity extends AppCompatActivity {
                 round = 1;
                 rCount.setText("Game ended");
                 Random r = new Random();
-                if (MaxRound == MinRound){
+                if (MaxRound == MinRound) {
                     mTimeLeftInMillis = 15000;
-                }
-                else {
+                } else {
                     mTimeLeftInMillis = (r.nextInt(MaxRound - MinRound) + MinRound) * 1000L;
                 }
                 START_TIME_IN_MILLIS = mTimeLeftInMillis;
-                ((ProgressBar)findViewById(R.id.progressBar)).setMax((int) mTimeLeftInMillis * 1000);
+                ((ProgressBar) findViewById(R.id.progressBar)).setMax((int) mTimeLeftInMillis * 1000);
                 updateCountDownText();
                 //the end button stops working, the timer returns to 00:00 and you need to reenter values
                 stopPlayer();
@@ -164,23 +214,22 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         updateCountDownText();
-        ((ProgressBar)findViewById(R.id.progressBar)).setMax(1);
-        ((ProgressBar)findViewById(R.id.progressBar)).setProgress(1);
+        ((ProgressBar) findViewById(R.id.progressBar)).setMax(1);
+        ((ProgressBar) findViewById(R.id.progressBar)).setProgress(1);
 
         sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
 
         boolean Background = sharedPreferences.getBoolean("background", false);
 
-        if(Background){
+        if (Background) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-        }
-        else {
+        } else {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         }
 
         AdRequest adRequest = new AdRequest.Builder().build();
 
-        InterstitialAd.load(this,"ca-app-pub-4384673899469944/3278334250", adRequest,//"ca-app-pub-3940256099942544/8691691433"
+        InterstitialAd.load(this, "ca-app-pub-4384673899469944/3278334250", adRequest,//"ca-app-pub-3940256099942544/8691691433"
                 new InterstitialAdLoadCallback() {
                     @Override
                     public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
@@ -206,18 +255,17 @@ public class MainActivity extends AppCompatActivity {
         public void onTextChanged(CharSequence s, int start, int before, int count) {
             String userInput1 = input1.getText().toString().trim();
             String userInput2 = input2.getText().toString().trim();
-            String userInput3= input3.getText().toString().trim();
+            String userInput3 = input3.getText().toString().trim();
 
-            boolean Valid = handleInput() ;// check how its true;
+            boolean Valid = handleInput();// check how its true;
 
-            if(Valid){
+            if (Valid) {
                 Random r = new Random();
                 MinRound = Integer.parseInt(userInput2);
                 MaxRound = Integer.parseInt(userInput3);
-                if (MaxRound == MinRound){
+                if (MaxRound == MinRound) {
                     mTimeLeftInMillis = MaxRound * 1000L;
-                }
-                else {
+                } else {
                     mTimeLeftInMillis = (r.nextInt(MaxRound - MinRound) + MinRound) * 1000L;
                 }
                 START_TIME_IN_MILLIS = mTimeLeftInMillis;
@@ -233,13 +281,14 @@ public class MainActivity extends AppCompatActivity {
 
         }
     };
-    public boolean handleInput(){
+
+    public boolean handleInput() {
         //Lengths();
         boolean Valid = true;
         boolean i2v = true;
         boolean i3v = true;
         TextView t = findViewById(R.id.input1);
-        if(!t.getText().toString().equals("")) {
+        if (!t.getText().toString().equals("")) {
             String input = t.getText().toString();
             Log.d("inputio1", input);
             int inp = Integer.parseInt(input);
@@ -247,68 +296,69 @@ public class MainActivity extends AppCompatActivity {
                 (findViewById(R.id.warning1)).setVisibility(View.VISIBLE);
                 Valid = false;
             } else {
-                ( findViewById(R.id.warning1)).setVisibility(View.INVISIBLE);
+                (findViewById(R.id.warning1)).setVisibility(View.INVISIBLE);
             }
+        } else {
+            (findViewById(R.id.warning1)).setVisibility(View.INVISIBLE);
+            Valid = false;
         }
-        else {( findViewById(R.id.warning1)).setVisibility(View.INVISIBLE);
-            Valid = false;}
 
         TextView t2 = findViewById(R.id.input2);
-        if (!t2.getText().toString().equals("")){
+        if (!t2.getText().toString().equals("")) {
             String input = t2.getText().toString();
-            Log.d("inputio2" , input);
+            Log.d("inputio2", input);
             int inp = Integer.parseInt(input);
-            if(inp < 5 || inp > 59) {
+            if (inp < 5 || inp > 59) {
                 (findViewById(R.id.warning2)).setVisibility(View.VISIBLE);
                 Valid = false;
                 i2v = false;
 
-                ((TextView)findViewById(R.id.warning2)).setText("The shortest round has to be between 5 - 59");
-                ((TextView)findViewById(R.id.warning3)).setText("The Longest round has to be between " + MaxDownLimit + " - 60");
-            }
-            else {
+                ((TextView) findViewById(R.id.warning2)).setText("The shortest round has to be between 5 - 59");
+                ((TextView) findViewById(R.id.warning3)).setText("The Longest round has to be between " + MaxDownLimit + " - 60");
+            } else {
                 (findViewById(R.id.warning2)).setVisibility(View.INVISIBLE);
                 MaxDownLimit = inp;
-                ((TextView)findViewById(R.id.warning2)).setText("The shortest round has to be between 5 - 59");
-                ((TextView)findViewById(R.id.warning3)).setText("The Longest round has to be between " + MaxDownLimit + " - 60");
+                ((TextView) findViewById(R.id.warning2)).setText("The shortest round has to be between 5 - 59");
+                ((TextView) findViewById(R.id.warning3)).setText("The Longest round has to be between " + MaxDownLimit + " - 60");
             }
-        }
-        else {(findViewById(R.id.warning2)).setVisibility(View.INVISIBLE);
+        } else {
+            (findViewById(R.id.warning2)).setVisibility(View.INVISIBLE);
             Valid = false;
-            i2v = false;}
+            i2v = false;
+        }
 
         TextView t3 = findViewById(R.id.input3);
-        if (!t3.getText().toString().equals("")){
+        if (!t3.getText().toString().equals("")) {
             String input = t3.getText().toString();
-            Log.d("inputio3" , input);
+            Log.d("inputio3", input);
             int inp = Integer.parseInt(input);
-            if(inp < MaxDownLimit || inp > 60 || inp < 5) {
+            if (inp < MaxDownLimit || inp > 60 || inp < 5) {
                 (findViewById(R.id.warning3)).setVisibility(View.VISIBLE);
                 Valid = false;
                 i3v = false;
 
-            }
-            else {
+            } else {
                 (findViewById(R.id.warning3)).setVisibility(View.INVISIBLE);
-                if (!i2v && i3v){
+                if (!i2v && i3v) {
                     MaxDownLimit = inp;
                 }
             }
-        }
-        else {(findViewById(R.id.warning3)).setVisibility(View.INVISIBLE);
+        } else {
+            (findViewById(R.id.warning3)).setVisibility(View.INVISIBLE);
             Valid = false;
-            i3v = false;}
+            i3v = false;
+        }
 
-        if(!i2v && i3v){
-            ((TextView)findViewById(R.id.warning2)).setText("The shortest round has to be between 5 - " + MaxDownLimit);
+        if (!i2v && i3v) {
+            ((TextView) findViewById(R.id.warning2)).setText("The shortest round has to be between 5 - " + MaxDownLimit);
             (findViewById(R.id.warning2)).setVisibility(View.VISIBLE);
         } else if (i2v && !i3v) {
-            ((TextView)findViewById(R.id.warning3)).setText("The Longest round has to be between " + MaxDownLimit + " - 60");
+            ((TextView) findViewById(R.id.warning3)).setText("The Longest round has to be between " + MaxDownLimit + " - 60");
             (findViewById(R.id.warning3)).setVisibility(View.VISIBLE);
         } else if (!i2v && !i3v) {
             MaxDownLimit = 5;
-            ((TextView)findViewById(R.id.warning2)).setText("The shortest round has to be between 5 - 59");
-            ((TextView)findViewById(R.id.warning3)).setText("The Longest round has to be between " + MaxDownLimit + " - 60");
+            ((TextView) findViewById(R.id.warning2)).setText("The shortest round has to be between 5 - 59");
+            ((TextView) findViewById(R.id.warning3)).setText("The Longest round has to be between " + MaxDownLimit + " - 60");
         }
 
         return Valid;
@@ -352,7 +402,7 @@ public class MainActivity extends AppCompatActivity {
                     if (autoRound) {
                         if (timerDefult) {
                             mTextViewCountDown.setVisibility(View.VISIBLE);
-                            ((ProgressBar)(findViewById(R.id.progressBar))).setVisibility(View.VISIBLE);
+                            ((ProgressBar) (findViewById(R.id.progressBar))).setVisibility(View.VISIBLE);
                             mTimeLeftInMillis = Integer.parseInt(tempTimeAuto) * 1000L;
                             timerDefult = false;
                             startTimer();
@@ -410,8 +460,7 @@ public class MainActivity extends AppCompatActivity {
         }
         if (fPause) {
             ((ProgressBar) findViewById(R.id.progressBar)).setMax((int) (mTimeLeftInMillis * 1000));
-        }
-        else {
+        } else {
             fPause = true;
         }
     }
@@ -420,7 +469,7 @@ public class MainActivity extends AppCompatActivity {
         mCountDownTimer.cancel();
         mTimerRunning = false;
         buttonStart.setText("Start");
-        if(timerDefult) {
+        if (timerDefult) {
             mButtonReset.setVisibility(View.VISIBLE);
             mButtonReset.setEnabled(true);
         }
@@ -442,31 +491,62 @@ public class MainActivity extends AppCompatActivity {
 
         mTextViewCountDown.setText(timeLeftFormatted);
 
-        ((ProgressBar)findViewById(R.id.progressBar)).setProgress((int) mTimeLeftInMillis * 1000);
+        ((ProgressBar) findViewById(R.id.progressBar)).setProgress((int) mTimeLeftInMillis * 1000);
     }
 
-    public void playPause(View v) {
-        if(!mTimerRunning){
+    public boolean playPause(View v) {
+        if (!mTimerRunning) {
             Log.d("MusiChairs", "pause");
             if (player != null) {
                 player.pause();
             }
-        }
-        else {
+        } else {
+            SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+            isLocalSong = sharedPreferences.getBoolean("isLocalSong", true);
+
             if (player == null) {
 
                 Log.d("MusiChairs", "play");
                 Songs();
-                player = MediaPlayer.create(this, SONGS.get(songNumber));
+                if (isLocalSong) {
+                String localSong = sharedPreferences.getString("localSong", null);;
+                    if (localSong != null) {
+                        Uri uri = Uri.parse(localSong);
+                        player = new MediaPlayer(); // Initialize player here
+                        if (verifyStoragePermissions()) {
+                            try {
+                             //   player = MediaPlayer.create(this, uri);
+                                player.setDataSource(this, uri);
+                                player.prepare();
+                            } catch (IOException e) {
+                                Log.e("MusiChairs", "Error setting data source", e); // Log the exception with a message
+                                Toast.makeText(this, "Local audio cannot be played", Toast.LENGTH_SHORT).show();
+                                return false;
+                            }
+                        } else {
+                            return false;
+                        }
+                    } else {
+                        Toast.makeText(this, "Local audio doesn't exist", Toast.LENGTH_SHORT).show();
+                        return false;
+                    }
+                } else {
+                    player = MediaPlayer.create(this, SONGS.get(songNumber));
+                }
+            }
+            if (player != null) {
                 player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                     @Override
-                    public void onCompletion(MediaPlayer mp) {
+                    public void onCompletion(MediaPlayer mp)
+                    {
                         stopPlayer();
+
                     }
                 });
-                }
-            player.start();
+                player.start();
+            }
         }
+        return true;
     }
 
     private void stopPlayer() {
@@ -476,8 +556,8 @@ public class MainActivity extends AppCompatActivity {
             Log.d("MusiChairs", "song released");
             //Toast.makeText(this, "MediaPlayer released", Toast.LENGTH_SHORT).show();
 
-        playPause(findViewById(R.id.button_start));
-        Log.d("MusiChairs", "song played again");
+            playPause(findViewById(R.id.button_start));
+            Log.d("MusiChairs", "song played again");
         }
     }
 
@@ -489,7 +569,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(settingsActive) {
+        if (settingsActive) {
             if (item.getItemId() == android.R.id.home) {
                 Intent intent = new Intent(this, Settings.class);
                 startActivityForResult(intent, SETTINGS_REQUEST_CODE);
@@ -508,14 +588,13 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
         String value = sharedPreferences.getString("song", "0");
         if (value.matches("\\d+")) {
-            Log.d("MusiChairs",  "check1");
+            Log.d("MusiChairs", "check1");
             if (Integer.parseInt(value) < 0 || Integer.parseInt(value) >= 15) {
-                Log.d("MusiChairs",  "check2");
+                Log.d("MusiChairs", "check2");
                 value = "0";
             }
-        }
-        else {
-            Log.d("MusiChairs",  "check3");
+        } else {
+            Log.d("MusiChairs", "check3");
             value = "0";
         }
         songNumber = Integer.parseInt(value);
@@ -524,19 +603,19 @@ public class MainActivity extends AppCompatActivity {
 
     public void TimerVisibility() {
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
-        boolean TimerVis =sharedPreferences.getBoolean("TimerVisibility", false);
+        boolean TimerVis = sharedPreferences.getBoolean("TimerVisibility", false);
         if (!TimerVis) {
             mTextViewCountDown.setVisibility(View.GONE);
-            ((ProgressBar)(findViewById(R.id.progressBar))).setVisibility(View.GONE);
+            ((ProgressBar) (findViewById(R.id.progressBar))).setVisibility(View.GONE);
             Log.d("MusiChairs", "Timer Invisible");
 
-        }
-        else {
+        } else {
             mTextViewCountDown.setVisibility(View.VISIBLE);
-            ((ProgressBar)(findViewById(R.id.progressBar))).setVisibility(View.VISIBLE);
+            ((ProgressBar) (findViewById(R.id.progressBar))).setVisibility(View.VISIBLE);
             Log.d("MusiChairs", "Timer Visible");
         }
     }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -547,10 +626,9 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        if(AdCounter < 3){
+        if (AdCounter < 3) {
             AdCounter++;
-        }
-        else {
+        } else {
             if (mInterstitialAd != null) {
                 mInterstitialAd.show(MainActivity.this);
             }
@@ -575,10 +653,28 @@ public class MainActivity extends AppCompatActivity {
             AdCounter = 1;
         }
     }
+
     public String Auto() {
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
         autoRound = sharedPreferences.getBoolean("auto", false);
 
         return sharedPreferences.getString("autoTimes", "10");
     }
+
+    public boolean verifyStoragePermissions() {
+        int permission = ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_AUDIO);
+
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(
+                    this,
+                    MainActivity.PERMISSIONS_STORAGE,
+                    MainActivity.REQUEST_EXTERNAL_STORAGE // Add the request code here
+            );
+            return false;
+        } else {
+            return true;
+        }
+    }
 }
+
+

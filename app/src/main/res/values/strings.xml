@@ -27,6 +27,9 @@
 
     <!-- Songs Preferences -->
     <string name="Songs_title">Change the song</string>
+    <string name="isLocalSong_title">Use a local audio file</string>
+    <string name="isLocalSong_off">Disabled</string>
+    <string name="isLocalSong_on">Active</string>
 
     <!-- Timer visibility Preferences -->
     <string name="Visibility_Timer_title">Show the timer</string>
@@ -36,10 +39,13 @@
     <!-- Auto Rounds Preferences -->
     <string name="auto_title">Automatic start of rounds</string>
     <string name="auto_on">Active</string>
-    <string name="auto_off">Not active</string>
+    <string name="auto_off">Disabled</string>
     <string name="auto_attach_title">The time between rounds</string>
     <string name="auto_attach_summery">Enter a value between 1 – 60</string>
 
     <!-- Facebook -->
     <string name="facebook_app_id">1051324902871943</string>
+
+
+
 </resources>
