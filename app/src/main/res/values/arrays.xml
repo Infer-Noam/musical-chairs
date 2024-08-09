@@ -25,4 +25,16 @@
         <item>8</item>
         <item>9</item>
     </string-array>
+
+    <string-array name="about_entries">
+        <item>AndroidX AppCompat</item>
+        <item>Google Material Components</item>
+        <item>AndroidX ConstraintLayout</item>
+        <item>AndroidX Preference</item>
+        <item>Google AdMob</item>
+        <item>JUnit</item>
+        <item>AndroidX Test Ext JUnit</item>
+        <item>Espresso</item>
+    </string-array>
+
 </resources>

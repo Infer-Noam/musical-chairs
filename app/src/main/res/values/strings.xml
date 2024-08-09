@@ -45,7 +45,12 @@
 
     <!-- Facebook -->
     <string name="facebook_app_id">1051324902871943</string>
-
+    <string name="terms_and_conditions_title">Terms and conditions</string>
+    <string name="privacy_policy_title">Privacy policy</string>
+    <string name="privacy_policy_url">https://galvanized-guarantee-592.notion.site/Privacy-Policy-for-Musical-Chairs-af51e80632b44c61847bf10ab4793bb9?pvs=4</string>
+    <string name="terms_and_conditions_url">https://galvanized-guarantee-592.notion.site/Terms-and-Conditions-for-Musical-Chairs-App-7fdf41c4689c4497a95118836feb2421?pvs=4</string>
+    <string name="about_header">About</string>
+    <string name="third_party_title">" Third-Party Services and SDKs"</string>
 
 
 </resources>

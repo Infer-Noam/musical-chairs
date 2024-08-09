@@ -70,4 +70,23 @@
 
     </PreferenceCategory>
 
+    <PreferenceCategory
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        app:title="@string/about_header">
+
+        <com.Infernoam.musicalchairs.PrivacyPolicyPreference
+            android:key="privacy_policy"
+            android:title="@string/privacy_policy_title"/>
+
+        <com.Infernoam.musicalchairs.TermsAndConditionsPreference
+            android:key="terms_and_conditions"
+            android:title="@string/terms_and_conditions_title" />
+
+        <Preference
+            android:key="third_party"
+            android:title="@string/third_party_title"/>
+
+
+    </PreferenceCategory>
 </PreferenceScreen>

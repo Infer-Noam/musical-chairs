@@ -1,8 +1,13 @@
 package com.Infernoam.musicalchairs;
 
+import static androidx.core.content.ContentProviderCompat.requireContext;
+
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -12,6 +17,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
 
@@ -46,6 +52,7 @@ public class Settings extends AppCompatActivity {
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
+                // Existing log
         listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
                 if (key.equals("background")){
@@ -79,6 +86,23 @@ public class Settings extends AppCompatActivity {
 
         }
 
+        @Override public boolean onPreferenceTreeClick(Preference preference) {
+            if (preference.getKey().equals("third_party")) {
+                showSongListDialog();
+                return true; // Click handled
+            }
+            return super.onPreferenceTreeClick(preference);
+        }
+        private void showSongListDialog() {
+            String[] thirdPartyEntries = getResources().getStringArray(R.array.about_entries);
+            new AlertDialog.Builder(requireContext())
+                    .setTitle(R.string.third_party_title)
+                    .setItems(thirdPartyEntries, (dialog, which) -> {
+                        dialog.dismiss();
+                        // Add any logic you need when a song is tapped
+                    })
+                    .show();
+        }
     }
 
     public void SaveBackground(){
@@ -174,6 +198,7 @@ public class Settings extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {

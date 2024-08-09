@@ -6,6 +6,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.ActivityCompat;
 
+
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.RequestConfiguration;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+
 import android.Manifest;
 
 import android.annotation.SuppressLint;
@@ -107,6 +113,17 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+
+        MobileAds.initialize(this) ;
+
+
+// Configure global settings for child-directed treatment
+        RequestConfiguration requestConfiguration = new RequestConfiguration.Builder()
+                .setTagForChildDirectedTreatment(RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_TRUE)
+                .build();
+
+        MobileAds.setRequestConfiguration(requestConfiguration);
 
 
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_settings);// set drawable icon
@@ -229,7 +246,8 @@ public class MainActivity extends AppCompatActivity {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         }
 
-        AdRequest adRequest = new AdRequest.Builder().build();
+        AdRequest adRequest = new AdRequest
+                .Builder().build();
 
         InterstitialAd.load(this, "ca-app-pub-4384673899469944/3278334250", adRequest,//"ca-app-pub-3940256099942544/8691691433"
                 new InterstitialAdLoadCallback() {
