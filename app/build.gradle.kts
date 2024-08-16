@@ -10,7 +10,7 @@ android {
         applicationId = "com.Infernoam.musichairs"
         minSdk = 24
         targetSdk = 34
-        versionCode = 10
+        versionCode = 12
         versionName = "3.2"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
