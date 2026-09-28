@@ -22,16 +22,22 @@ These instructions will get you a copy of the project up and running on your loc
 
 ## Screenshots
 ### First round [light mode]
-![image](https://github.com/Infer-Noam/Musichairs/assets/145200566/9eaaee31-1d30-436b-90b8-45828820f7a6) 
+<img width="303" height="592" alt="First round light mode" src="https://github.com/user-attachments/assets/8d5e9e54-0d7c-4715-bad8-1bedd1ac06b2" />
+
 ### Second round [light mode]
-![image](https://github.com/Infer-Noam/Musichairs/assets/145200566/56d6b8a4-de65-4185-bfe6-b589d08c6d00)
+<img width="302" height="592" alt="Second round light mode" src="https://github.com/user-attachments/assets/92ba4e4e-9eb2-46e2-bb66-5faeabf72ec0" />
+
 ### Game end [light mode]
-![image](https://github.com/Infer-Noam/Musichairs/assets/145200566/b6eddff1-bbae-4fd7-8587-a651811726df)
+<img width="301" height="592" alt="Game end light mode" src="https://github.com/user-attachments/assets/3cfb0218-7d21-4c87-8e4c-c5dbd8d22e8b" />
+
 ### Settings [light mode]
-![image](https://github.com/Infer-Noam/Musichairs/assets/145200566/1bdf787a-9e08-466e-b40c-8206d70256a5)
+<img width="303" height="592" alt="Settings light mode" src="https://github.com/user-attachments/assets/8abe569f-bbbd-44b7-9b4e-f18b88802fa9" />
+
 ### Settings [dark mode]
-![image](https://github.com/Infer-Noam/Musichairs/assets/145200566/18199ae8-a673-4e94-8906-693a5c570f54)
+<img width="303" height="592" alt="Settings dark mode" src="https://github.com/user-attachments/assets/8ea513f5-a3b8-407f-a1c0-4b90e33a36f9" />
+
 ### First round [dark mode]
-![image](https://github.com/Infer-Noam/Musichairs/assets/145200566/ea3da96e-cbb1-4a4a-8874-5d2ffd77f440)
+<img width="303" height="592" alt="First round dark mode" src="https://github.com/user-attachments/assets/ff939ffa-74bd-43a4-bef1-efdabbab5c12" />
+
 ### Game end [dark mode]
-![image](https://github.com/Infer-Noam/Musichairs/assets/145200566/c661e52b-71b0-46b4-b3ce-48982c0776f3)
+<img width="303" height="592" alt="unnamed-8" src="https://github.com/user-attachments/assets/5ad91438-8b45-4e87-afc2-491a504c4c9d" />
